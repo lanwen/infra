@@ -1,6 +1,7 @@
 def projects = [
         'jenkinsci/github-pullrequest-plugin',
         'jenkinsci/github-plugin',
+        'jenkinsci/docker-plugin',
 ]
 
 def JACOCO_VER = "0.7.5.201505241946"
@@ -62,7 +63,7 @@ projects.each { project ->
 
         triggers {
             onPullRequest {
-                setPreStatus()
+//                setPreStatus()
                 cron('H/5 * * * *')
                 mode {
                     cron()
@@ -90,10 +91,10 @@ projects.each { project ->
         }
         
         publishers {
-            commitStatusOnGH {
-                unstableAsError()
-                message('Build finished')
-            }
+//            commitStatusOnGH {
+//                unstableAsError()
+//                message('Build finished')
+//            }
         }
     }
 }
