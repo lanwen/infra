@@ -42,9 +42,6 @@ projects.each { project ->
 
         publishers {
             sonar()
-            archiveArtifacts {
-                pattern('target/*.hpi,target/checkout/target/*.hpi')
-            }
         }
     }
 }
