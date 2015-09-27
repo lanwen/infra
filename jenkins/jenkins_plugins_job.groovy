@@ -39,7 +39,7 @@ projects.each { project ->
             scm('H/10 * * * *')
         }
 
-        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean test")
+        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
 
         publishers {
             sonar()
@@ -75,7 +75,7 @@ projects.each { project ->
             }
         }
 
-        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean test")
+        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
 
         configure { job ->
             job / publishers << 'hudson.plugins.sonar.SonarPublisher' {
