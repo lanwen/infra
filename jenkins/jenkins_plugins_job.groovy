@@ -49,6 +49,9 @@ projects.each { project ->
 }
 
 projects.each { project ->
+    if(project.equals('jenkinsci/envinject-plugin')) {
+        return
+    }
     mavenJob(project.replace('/', '-') + '_pr-test') {
         label('master')
         scm {
