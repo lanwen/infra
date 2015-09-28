@@ -2,6 +2,7 @@ def projects = [
         'jenkinsci/github-pullrequest-plugin',
         'jenkinsci/github-plugin',
         'jenkinsci/docker-plugin',
+        'jenkinsci/envinject-plugin'
 ]
 
 def JACOCO_VER = "0.7.5.201505241946"
