@@ -6,6 +6,7 @@ def projects = [
 ]
 
 def JACOCO_VER = "0.7.5.201505241946"
+def CREDS_ID = 'b4a9fdbe-64cd-4c72-9c73-686b177c40ce'
 
 listView('Jenkins Plugins') {
     jobs {
@@ -22,13 +23,13 @@ listView('Jenkins Plugins') {
 }
 
 projects.each { project ->
-    mavenJob(project.replace('/', '-') + '_master-test') {
+    mavenJob(project.replace('/', '-') + '_master-test-release') {
         label('master')
         scm {
             git {
                 remote {
                     github(project, 'ssh', 'github.com')
-                    credentials('b4a9fdbe-64cd-4c72-9c73-686b177c40ce')
+                    credentials(CREDS_ID)
                 }
                 branch('master')
                 localBranch('master')
@@ -37,10 +38,24 @@ projects.each { project ->
 
         triggers {
             githubPush()
-            scm('H/10 * * * *')
+            scm('H */2 * * *')
         }
 
-        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
+        wrappers {
+            configFiles {
+                mavenSettings('jenkins_release_settings') {
+                    variable('SETTINGS_LOCATION')
+                }
+            }
+            sshAgent(CREDS_ID)
+            mavenRelease {
+                releaseGoals('-s ${SETTINGS_LOCATION} -P jenkins release:clean release:prepare release:perform')
+                dryRunGoals('-DdryRun=true -s ${SETTINGS_LOCATION} release:clean release:prepare -P jenkins')
+                numberOfReleaseBuildsToKeep(10)
+            }
+        }
+
+        goals("-s " + '${SETTINGS_LOCATION}' + " -P jenkins org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
 
         publishers {
             sonar()
@@ -58,7 +73,7 @@ projects.each { project ->
             git {
                 remote {
                     github(project, 'ssh', 'github.com')
-                    credentials('b4a9fdbe-64cd-4c72-9c73-686b177c40ce')
+                    credentials(CREDS_ID)
                     refspec('+refs/pull/${GITHUB_PR_NUMBER}/${GITHUB_PR_COND_REF}:refs/remotes/origin/pull/${GITHUB_PR_NUMBER}/${GITHUB_PR_COND_REF}')
                 }
                 branch('pull/${GITHUB_PR_NUMBER}/${GITHUB_PR_COND_REF}')
