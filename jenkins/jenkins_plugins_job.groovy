@@ -36,7 +36,9 @@ projects.each { project ->
                     credentials(CREDS_ID)
                 }
                 branch('master')
-                localBranch('master')
+                extensions {
+                    localBranch('master')
+                }
             }
         }
 
