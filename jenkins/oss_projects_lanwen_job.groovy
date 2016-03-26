@@ -21,6 +21,10 @@ listView('OSS Projects') {
 
 projects.each { project ->
     mavenJob('oss_' + project.replace('/', '-') + '_master-deploy') {
+        logRotator {
+            numToKeep(5)
+            artifactNumToKeep(2)
+        }
         label('master')
         scm {
             git {
@@ -59,6 +63,10 @@ projects.each { project ->
 projects.each { project ->
     mavenJob('oss_' + project.replace('/', '-') + '_pr-test') {
         label('master')
+        logRotator {
+            numToKeep(5)
+            artifactNumToKeep(2)
+        }
         scm {
             git {
                 remote {
