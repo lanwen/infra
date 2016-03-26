@@ -1,0 +1,31 @@
+upstream sonar_server {
+    server 127.0.0.1:9000 max_fails=3 fail_timeout=30s;
+}
+
+server {
+    listen sonar.lanwen.ru:80;
+    server_name sonar.lanwen.ru;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen sonar.lanwen.ru:443 ssl;
+    server_name sonar.lanwen.ru;
+    
+    include /etc/nginx/ssl.conf;
+    
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        if (!-f $request_filename) {
+            proxy_pass http://sonar_server;
+            break;
+        }
+    }
+}

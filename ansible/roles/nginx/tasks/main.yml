@@ -1,0 +1,25 @@
+- name: Install nginx
+  sudo: yes
+  apt: pkg=nginx state=installed
+  
+- name: Create ssl dir
+  sudo: yes
+  file: dest=/etc/nginx/ssl state=directory mode=600
+  tags:
+    - nginx
+  
+- name: copy nginx ssl config
+  template: src=etc/nginx/ssl.conf dest=/etc/nginx/ssl.conf
+  sudo: yes
+  tags:
+    - nginx
+    
+- name: copy sites
+  template: src=etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-available/{{item}}
+  sudo: yes
+  with_items:
+    - jenkins
+    - sonar
+  tags:
+    - nginx
+  

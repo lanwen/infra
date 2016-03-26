@@ -1,0 +1,6 @@
+---
+- name: Setup nginx
+  hosts: all
+  sudo: yes
+  roles:
+    - nginx
