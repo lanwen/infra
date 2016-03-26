@@ -25,6 +25,10 @@ listView('Jenkins Plugins') {
 projects.each { project ->
     mavenJob(project.replace('/', '-') + '_master-test-release') {
         label('master')
+        logRotator {
+            numToKeep(5)
+            artifactNumToKeep(2)
+        }
         scm {
             git {
                 remote {
@@ -69,6 +73,10 @@ projects.each { project ->
     }
     mavenJob(project.replace('/', '-') + '_pr-test') {
         label('master')
+        logRotator {
+            numToKeep(5)
+            artifactNumToKeep(2)
+        }
         scm {
             git {
                 remote {
