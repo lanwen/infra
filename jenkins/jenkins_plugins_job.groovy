@@ -78,7 +78,7 @@ projects.each { project ->
 }
 
 projects.each { project ->
-    if(project.equals('jenkinsci/envinject-plugin')) {
+    if(project.equals('jenkinsci/envinject-plugin') || project.equals('jenkinsci/docker-plugin')) {
         return
     }
     mavenJob(project.replace('/', '-') + '_pr-test') {
