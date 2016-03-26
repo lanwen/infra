@@ -33,7 +33,9 @@ projects.each { project ->
                     credentials(CREDS_ID)
                 }
                 branch('master')
-                localBranch('master')
+                extensions {
+                    localBranch('master')
+                }
             }
         }
   
@@ -52,9 +54,20 @@ projects.each { project ->
         }
 
         goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean deploy")
+        
+        postBuildSteps {
+            maven {
+                goals('$SONAR_MAVEN_GOAL')
+                property('sonar.host.url', '$SONAR_HOST_URL')
+                mavenOpts('-Xmx1024m -Xms256m')
+            }
+        }
+  
+        configure { job ->
+            job / buildWrappers << 'hudson.plugins.sonar.SonarBuildWrapper'()
+        }
 
         publishers {
-            sonar()
             jacocoCodeCoverage()
         }
 }
