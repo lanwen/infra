@@ -61,8 +61,16 @@ projects.each { project ->
 
         goals("-s " + '${SETTINGS_LOCATION}' + " -P jenkins org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
 
-        publishers {
-            sonar()
+        postBuildSteps {
+            maven {
+                goals('$SONAR_MAVEN_GOAL')
+                property('sonar.host.url', '$SONAR_HOST_URL')
+                mavenOpts('-Xmx1024m -Xms256m')
+            }
+        }
+        
+        configure { job ->
+            job / buildWrappers << 'hudson.plugins.sonar.SonarBuildWrapper'()
         }
     }
 }
@@ -90,7 +98,6 @@ projects.each { project ->
 
         triggers {
             onPullRequest {
-//                setPreStatus()
                 cron('H/5 * * * *')
                 mode {
                     cron()
@@ -103,25 +110,22 @@ projects.each { project ->
         }
 
         goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
-
-        configure { job ->
-            job / publishers << 'hudson.plugins.sonar.SonarPublisher' {
-                jdk('(Inherit From Job)')
-                branch()
-                language()
-                mavenOpts("-Xmx1024m -Xms256m")
-                jobAdditionalProperties('-Dsonar.analysis.mode=incremental -Dsonar.github.pullRequest=$GITHUB_PR_NUMBER -Dsonar.github.repository=' + project)
-                settings(class: 'jenkins.mvn.DefaultSettingsProvider')
-                globalSettings(class: 'jenkins.mvn.DefaultGlobalSettingsProvider')
-                usePrivateRepository(false)
+        
+        postBuildSteps {
+            maven {
+                goals('$SONAR_MAVEN_GOAL $SONAR_EXTRA_PROPS')
+                properties(
+                    'sonar.host.url': '$SONAR_HOST_URL',
+                    'sonar.analysis.mode': 'incremental',
+                    'sonar.github.pullRequest': '$GITHUB_PR_NUMBER',
+                    'sonar.github.repository': project
+                )
+                mavenOpts('-Xmx1024m -Xms256m')
             }
         }
-        
-        publishers {
-//            commitStatusOnGH {
-//                unstableAsError()
-//                message('Build finished')
-//            }
+  
+        configure { job ->
+            job / buildWrappers << 'hudson.plugins.sonar.SonarBuildWrapper'()
         }
     }
 }
