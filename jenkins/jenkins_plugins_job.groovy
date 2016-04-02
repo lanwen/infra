@@ -117,6 +117,7 @@ projects.each { project ->
         postBuildSteps {
             maven {
                 goals('$SONAR_MAVEN_GOAL $SONAR_EXTRA_PROPS')
+                mavenInstallation('default')
                 properties(
                     'sonar.host.url': '$SONAR_HOST_URL',
                     'sonar.analysis.mode': 'incremental',
