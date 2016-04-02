@@ -65,6 +65,7 @@ projects.each { project ->
 
         postBuildSteps {
             maven {
+                mavenInstallation('default')
                 goals('$SONAR_MAVEN_GOAL')
                 property('sonar.host.url', '$SONAR_HOST_URL')
                 mavenOpts('-Xmx1024m -Xms256m')
