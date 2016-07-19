@@ -120,7 +120,7 @@ projects.each { project ->
                 mavenInstallation('default')
                 properties(
                     'sonar.host.url': '$SONAR_HOST_URL',
-                    'sonar.analysis.mode': 'incremental',
+                    'sonar.analysis.mode': 'preview',
                     'sonar.github.pullRequest': '$GITHUB_PR_NUMBER',
                     'sonar.github.repository': project
                 )
