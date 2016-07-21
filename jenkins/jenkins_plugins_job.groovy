@@ -5,7 +5,7 @@ def projects = [
         'jenkinsci/envinject-plugin'
 ]
 
-def JACOCO_VER = "0.7.5.201505241946"
+def JACOCO_VER = '0.7.5.201505241946'
 def CREDS_ID = 'b4a9fdbe-64cd-4c72-9c73-686b177c40ce'
 
 listView('Jenkins Plugins') {
@@ -66,13 +66,17 @@ projects.each { project ->
         postBuildSteps {
             maven {
                 mavenInstallation('default')
-                goals('org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:report')
+                goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:report")
+                property('jacoco.skip', '$IS_M2RELEASEBUILD')
             }
-            shell("curl -s https://codecov.io/bash > codecov.sh && chmod +x ./codecov.sh && ./codecov.sh -X nocolor -X gcov")    
+            shell("curl -s https://codecov.io/bash > codecov.sh && chmod +x ./codecov.sh && ./codecov.sh -X nocolor -X gcov || echo 'Cant send data to codecov'")    
             maven {
                 mavenInstallation('default')
                 goals('$SONAR_MAVEN_GOAL')
-                property('sonar.host.url', '$SONAR_HOST_URL')
+                properties(
+                    'sonar.host.url': '$SONAR_HOST_URL',
+                    'sonar.skip': '$IS_M2RELEASEBUILD'
+                )
                 mavenOpts('-Xmx1024m -Xms256m')
             }
         }
@@ -120,6 +124,11 @@ projects.each { project ->
         goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
         
         postBuildSteps {
+            maven {
+                mavenInstallation('default')
+                goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:report")
+            }
+            shell('curl -s https://codecov.io/bash > codecov.sh && chmod +x ./codecov.sh && ./codecov.sh -X nocolor -X gcov -P $GITHUB_PR_NUMBER || echo "Cant send data to codecov"')    
             maven {
                 goals('$SONAR_MAVEN_GOAL $SONAR_EXTRA_PROPS')
                 mavenInstallation('default')
