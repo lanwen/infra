@@ -1,0 +1,45 @@
+- name: Install pip
+  apt: pkg=python-pip state=installed
+  
+- pip: name={{item}}
+  with_items:
+    - docker-py
+    - docker-compose
+
+- file: path=/opt/sonarqube/ state=absent
+
+- name: Create extensions dir for sonar
+  file: path=/opt/sonarqube/ state=directory
+- file: path=/opt/sonarqube/extensions state=directory
+- file: path=/opt/sonarqube/extensions/plugins state=directory
+
+- get_url:
+    url: "{{item.url}}"
+    dest: /opt/sonarqube/extensions/plugins
+  with_items: sonar_plugins
+
+- name: Run sonar service
+  docker_service:
+    project_name: sonarqube
+    definition:
+      version: '2'
+      services:
+        db:
+          image: mysql:5.6
+          volumes:
+            - /var/lib/mysql:/var/lib/mysql 
+#          command: --skip-grant-tables  # if there is troubles to connect with existing db
+        sonar:
+          image: "sonarqube:lts"
+          environment: 
+            SONARQUBE_JDBC_USERNAME: sonar
+            SONARQUBE_JDBC_URL: jdbc:mysql://db:3306/sonardb?useUnicode=true&characterEncoding=utf8
+          ports:
+            - "127.0.0.1:9000:9000"
+            - "127.0.0.1:9092:9092"
+          volumes:
+            - /opt/sonarqube/extensions/plugins:/opt/sonarqube/extensions/plugins
+          depends_on:
+            - db
+          links:
+            - db

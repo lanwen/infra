@@ -1,0 +1,8 @@
+---
+- name: Setup all
+  hosts: all
+  sudo: yes
+  roles:
+    - nginx
+    - letsencrypt
+    - sonar

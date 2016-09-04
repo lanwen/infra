@@ -8,13 +8,16 @@
   tags:
     - nginx
   
-- name: copy nginx ssl config
+- name: Copy nginx ssl config
   template: src=etc/nginx/ssl.conf dest=/etc/nginx/ssl.conf
   sudo: yes
   tags:
     - nginx
+
+- name: Create dhparam (can be long-running)
+  command: openssl dhparam 2048 -out /etc/nginx/ssl/dhparam.pem
     
-- name: copy sites
+- name: Copy sites
   template: src=etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-available/{{item}}
   sudo: yes
   with_items:
@@ -22,4 +25,15 @@
     - sonar
   tags:
     - nginx
-  
+
+- name: Remove default site
+  file: path=/etc/nginx/sites-enabled/default state=absent
+    
+- name: Enable sites
+  file: src=/etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-enabled/{{item}} state=link
+  with_items:
+      - jenkins
+      - sonar
+    
+- name: Restart nginx
+  service: name=nginx state=restarted

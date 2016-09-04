@@ -1,0 +1,21 @@
+- name: Download client for letsencrypt
+  get_url:
+    url: https://dl.eff.org/certbot-auto
+    dest: /usr/sbin/certbot-auto
+    mode: a+x
+    
+- name: Run script to test
+  command: /usr/sbin/certbot-auto renew --dry-run
+  ignore_errors: true
+  
+- name: Stop nginx
+  service: name=nginx state=stopped
+  
+- name: Run cert installation
+  command: /usr/sbin/certbot-auto certonly -n --standalone --agree-tos --email lanwen@yandex.ru -d ci.lanwen.ru -d sonar.lanwen.ru
+    
+- name: Start nginx
+  service: name=nginx state=started
+  
+- name: Create cron command to renew
+  cron: name="Renew letsencrypt certificates" minute="0" hour="2" job='/usr/sbin/certbot-auto renew --standalone --pre-hook "service nginx stop" --post-hook "service nginx start" --quiet'
