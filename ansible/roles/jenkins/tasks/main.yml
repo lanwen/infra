@@ -18,7 +18,7 @@
           image: "jenkins:2.7.3"
           ports:
             - "127.0.0.1:8080:8080"
-            - "127.0.0.1:50000:50000"
+            - "0.0.0.0:50000:50000"
           user: "1000:jenkins"
           environment:
             JAVA_OPTS: "-Dhudson.model.ParametersAction.keepUndefinedParameters=true -Dfile.encoding=UTF8 -Djava.awt.headless=true -Xms1024M -Xmx1024M -Xmn1024M -XX:MaxPermSize=512M -Duser.timezone=Europe/Moscow"
@@ -26,6 +26,9 @@
             - /opt/jenkins:/var/jenkins_home
             - /home/jenkins:/home/jenkins
             - /etc/letsencrypt/:/etc/letsencrypt
-            
+
 - name: Import certs to java
-  raw: docker exec -it -u root jenkins_jenkins_1 keytool -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -importcert -file /etc/letsencrypt/live/ci.lanwen.ru/chain.pem
+  raw: docker exec -it -u root jenkins_jenkins_1 keytool -trustcacerts -keystore /etc/ssl/certs/java/cacerts -storepass changeit -noprompt -importcert -file /etc/letsencrypt/live/ci.lanwen.ru/chain.pem
+
+- name: Backup cert
+  raw: docker cp jenkins_jenkins_1:/etc/ssl/certs/java/cacerts /home/jenkins/cacerts

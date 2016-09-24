@@ -1,7 +1,7 @@
 ---
 - name: Setup all
   hosts: all
-  sudo: yes
+  become_method: sudo
   roles:
 #    - nginx
 #    - letsencrypt
