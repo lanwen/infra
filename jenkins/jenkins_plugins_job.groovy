@@ -55,21 +55,15 @@ projects.each { project ->
             }
             sshAgent(CREDS_ID)
             mavenRelease {
-                releaseGoals('-s ${SETTINGS_LOCATION} -P jenkins release:clean release:prepare release:perform')
+                releaseGoals('-s ${SETTINGS_LOCATION} -P jenkins release:clean release:prepare release:perform -Darguments="-DskipTests"')
                 dryRunGoals('-DdryRun=true -s ${SETTINGS_LOCATION} release:clean release:prepare -P jenkins')
                 numberOfReleaseBuildsToKeep(10)
             }
         }
 
-        goals("-s " + '${SETTINGS_LOCATION}' + " -P jenkins org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
+        goals("-s " + '${SETTINGS_LOCATION}' + " -P jenkins clean compile")
 
         postBuildSteps {
-            maven {
-                mavenInstallation('default')
-                goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:report")
-                property('jacoco.skip', '$IS_M2RELEASEBUILD')
-            }
-            shell("curl -s https://codecov.io/bash > codecov.sh && chmod +x ./codecov.sh && ./codecov.sh -X nocolor -X gcov || echo 'Cant send data to codecov'")    
             maven {
                 mavenInstallation('default')
                 goals('$SONAR_MAVEN_GOAL')
@@ -121,15 +115,10 @@ projects.each { project ->
             }
         }
 
-        goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:prepare-agent clean install")
+        goals("clean compile")
         
         postBuildSteps {
-            maven {
-                mavenInstallation('default')
-                goals("org.jacoco:jacoco-maven-plugin:${JACOCO_VER}:report")
-            }
-            shell('curl -s https://codecov.io/bash > codecov.sh && chmod +x ./codecov.sh && ./codecov.sh -X nocolor -X gcov -P $GITHUB_PR_NUMBER || echo "Cant send data to codecov"')    
-            maven {
+             maven {
                 goals('$SONAR_MAVEN_GOAL $SONAR_EXTRA_PROPS')
                 mavenInstallation('default')
                 properties(
