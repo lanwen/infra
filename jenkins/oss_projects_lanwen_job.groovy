@@ -2,7 +2,8 @@ def JACOCO_VER = '0.7.5.201505241946'
 def CREDS_ID = 'b4a9fdbe-64cd-4c72-9c73-686b177c40ce'
 def projects = [
   'VerbalExpressions/JavaVerbalExpressions',
-  'yandex-qatools/uri-differ'
+  'yandex-qatools/uri-differ',
+  'lanwen/rarc'
 ]
 
 listView('OSS Projects') {
