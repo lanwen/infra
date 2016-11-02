@@ -1,9 +1,10 @@
 ---
 - name: Setup all
   hosts: all
+  become: yes
   become_method: sudo
   roles:
 #    - nginx
 #    - letsencrypt
 #    - sonar
-    - jenkins
+#    - jenkins

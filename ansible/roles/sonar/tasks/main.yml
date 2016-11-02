@@ -14,9 +14,9 @@
 - file: path=/opt/sonarqube/extensions/plugins state=directory
 
 - get_url:
-    url: "{{item.url}}"
+    url: '{{ item.url }}'
     dest: /opt/sonarqube/extensions/plugins
-  with_items: sonar_plugins
+  with_items: '{{ sonar_plugins }}'
 
 - name: Run sonar service
   docker_service:
