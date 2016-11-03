@@ -3,7 +3,7 @@ def CREDS_ID = 'b4a9fdbe-64cd-4c72-9c73-686b177c40ce'
 def projects = [
   'VerbalExpressions/JavaVerbalExpressions',
   'yandex-qatools/uri-differ',
-  'lanwen/rarc'
+  'qameta/rarc'
 ]
 
 listView('OSS Projects') {
