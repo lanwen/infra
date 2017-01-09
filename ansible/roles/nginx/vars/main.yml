@@ -1,2 +1,6 @@
 ---
 cert_path: /etc/letsencrypt/live/ci.lanwen.ru/
+sites:
+  - jenkins
+  - sonar
+#  - weather

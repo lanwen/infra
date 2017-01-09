@@ -20,9 +20,7 @@
 - name: Copy sites
   template: src=etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-available/{{item}}
   sudo: yes
-  with_items:
-    - jenkins
-    - sonar
+  with_items: '{{ sites }}'
   tags:
     - nginx
 
@@ -31,9 +29,7 @@
     
 - name: Enable sites
   file: src=/etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-enabled/{{item}} state=link
-  with_items:
-      - jenkins
-      - sonar
-    
+  with_items: '{{ sites }}'
+
 - name: Restart nginx
   service: name=nginx state=restarted
